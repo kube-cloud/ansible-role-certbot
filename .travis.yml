@@ -40,8 +40,10 @@ install:
 # Test scripts
 script:
 
-    # Run Tests
-    - molecule test --all
+    - if [ "$MOLECULE_DISTRO" == "centos6" ]; then molecule test --scenario-name certbot_auto_install; fi
+    - if [ "$MOLECULE_DISTRO" == "centos7" ]; then molecule test --scenario-name certbot_install; fi
+    - if [ "$MOLECULE_DISTRO" == "ubuntu16" ]; then molecule test --scenario-name certbot_install; fi
+    - if [ "$MOLECULE_DISTRO" == "ubuntu18" ]; then molecule test --scenario-name certbot_install; fi
 
 # Norifications
 notifications:

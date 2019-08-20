@@ -10,7 +10,7 @@ driver:
 lint:
     name: yamllint
     options:
-        config-file: molecule/certbot_install/yaml-lint.yml
+        config-file: molecule/certbot_auto_install/yaml-lint.yml
 platforms:
     - name: ${MOLECULE_DISTRO:-centos7}
       image: "kubecloudsas/docker-ansible-test:${MOLECULE_DISTRO:-centos7}"
@@ -32,7 +32,7 @@ provisioner:
     playbooks:
         converge: ${MOLECULE_PLAYBOOK:-playbook.yml}
 scenario:
-    name: certbot_install
+    name: certbot_auto_install
     test_sequence:
         - lint
         - dependency
