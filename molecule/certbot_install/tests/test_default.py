@@ -22,11 +22,3 @@ def test_certbot_installed(host):
 
     # Assert that run is OK
     assert command_run.rc == 0
-
-    # Get the running version
-    version = command_run.stderr\
-                         .split('\n')[0]\
-                         .split(' ')[1]
-
-    # Assert version is not empty
-    assert len(version) > 0

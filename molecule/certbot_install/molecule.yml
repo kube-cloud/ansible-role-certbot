@@ -12,8 +12,8 @@ lint:
     options:
         config-file: molecule/certbot_install/yaml-lint.yml
 platforms:
-    - name: ${MOLECULE_DISTRO:-centos7}
-      image: "kubecloudsas/docker-ansible-test:${MOLECULE_DISTRO:-centos7}"
+    - name: ${MOLECULE_DISTRO:-ubuntu18}
+      image: "kubecloudsas/docker-ansible-test:${MOLECULE_DISTRO:-ubuntu18}"
       command: ${MOLECULE_DOCKER_COMMAND:-""}
       volumes:
           - /sys/fs/cgroup:/sys/fs/cgroup:ro
