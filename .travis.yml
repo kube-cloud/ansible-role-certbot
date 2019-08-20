@@ -14,7 +14,6 @@ env:
         - ROLE_NAME: certbot
         - AUTHOR: jetune
     matrix:
-        - MOLECULE_DISTRO: centos6
         - MOLECULE_DISTRO: centos7
         - MOLECULE_DISTRO: ubuntu16
         - MOLECULE_DISTRO: ubuntu18
@@ -39,7 +38,7 @@ install:
 # Test scripts
 script:
 
-    - molecule test --all
+    - molecule test --scenario-name certbot_install
 
 # Norifications
 notifications:
