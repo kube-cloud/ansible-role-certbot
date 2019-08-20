@@ -1,0 +1,52 @@
+---
+dependency:
+    name: galaxy
+    options:
+        ignore-certs: true
+        ignore-errors: true
+    enabled: true
+driver:
+    name: docker
+lint:
+    name: yamllint
+    options:
+        config-file: molecule/certbot_install/yaml-lint.yml
+platforms:
+    - name: ${MOLECULE_DISTRO:-centos7}
+      image: "kubecloudsas/docker-ansible-test:${MOLECULE_DISTRO:-centos7}"
+      command: ${MOLECULE_DOCKER_COMMAND:-""}
+      volumes:
+          - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      privileged: true
+      pre_build_image: true
+
+provisioner:
+    name: ansible
+    env:
+        ANSIBLE_ROLES_PATH: molecule/roles
+    lint:
+        name: ansible-lint
+        options:
+            force-color: true
+            x: ['403']
+    playbooks:
+        converge: ${MOLECULE_PLAYBOOK:-playbook.yml}
+scenario:
+    name: certbot_install
+    test_sequence:
+        - lint
+        - dependency
+        - syntax
+        - destroy
+        - create
+        - prepare
+        - converge
+        - idempotence
+        - side_effect
+        - verify
+        - cleanup
+        - destroy
+verifier:
+    name: testinfra
+    lint:
+        name: flake8

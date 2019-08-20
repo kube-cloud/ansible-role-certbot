@@ -1,0 +1,89 @@
+---
+
+- name: ({{ ansible_distribution }}) Define System facts
+  set_fact:
+   os_with_version: "{{ ansible_distribution }} {{ ansible_distribution_major_version }}"
+   os_family: "{{ ansible_os_family }}"
+   os_major_release: "{{ ansible_distribution_major_version }}"
+   os_release: "{{ ansible_distribution_version }}"
+   os_arch: "{{ (os_architecture | default(ansible_architecture)) | replace('amd64', 'x86_64') }}"
+   os_distribution: "{{ ansible_distribution }}"
+   os_codename: "{{ ansible_distribution_release }}"
+   os_uname: "{{ ansible_system }}"
+
+- name: ({{ os_with_version }}) Check If pip is installed
+  command: "pip --version"
+  register: pip_run
+  ignore_errors: true
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: ({{ os_with_version }}) Define Certbot Installation Action Flag global facts
+  set_fact:
+   certbot_install_tool: "{{ install_tool | default(true) }}"
+   certbot_generate_certs: "{{ generate_certs | default(false) }}"
+   certbot_certs_validity: "{{ certs_validity | default(80) }}"
+   pip_installed: "{{ true if (pip_run.rc == 0) else false }}"
+
+- name: ({{ os_with_version }}) Define Certbot Installation facts for Debian OS
+  set_fact:
+   certbot_packages: "{{ ['certbot'] + (extra_packages | default([])) }}"
+   certbot_renew_post_command: "{{ 'certbot renew ' + \
+   ('&& ' + renew_post_command if (renew_post_command is defined and renew_post_command|trim|length > 0) \
+   else '' ) }}"
+  when:
+   - ansible_os_family == "Debian"
+
+- name: ({{ os_with_version }}) Define Certbot Installation facts for RedHat OS
+  set_fact:
+   epel_repo_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ os_major_release }}.noarch.rpm"
+   epel_repo_gpg_key_url: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ os_major_release }}"
+   epel_repofile_path: "/etc/yum.repos.d/epel.repo"
+  when:
+   - ansible_distribution == "CentOS"
+
+- name: ({{ os_with_version }}) Define Certbot Installation facts for RedHat OS
+  set_fact:
+   certbot_packages: "{{ ['yum-utils', 'certbot'] + (extra_packages | default([])) }}"
+   certbot_renew_post_command: "{{ 'certbot renew ' + \
+   ('&& ' + renew_post_command if (renew_post_command is defined and renew_post_command|trim|length > 0) \
+   else '' ) }}"
+  when:
+   - ansible_distribution == "CentOS"
+   - ansible_distribution_major_version|int > 6
+
+- name: ({{ os_with_version }}) Define Certbot Installation facts for CentOS
+  set_fact:
+   certbot_packages: "['gcc', 'libffi-devel', 'openssl-devel', 'python34', 'python34-devel', \
+   'python34-tools', 'redhat-rpm-config', 'openssl', 'augeas-libs']"
+   certbot_auto_url: "https://dl.eff.org/certbot-auto"
+   certbot_renew_post_command: "{{ 'certbot-auto renew ' + \
+   ('&& ' + renew_post_command if (renew_post_command is defined and renew_post_command|trim|length > 0) \
+   else '' ) }}"
+  when:
+   - ansible_distribution == "CentOS"
+   - ansible_distribution_major_version|int == 6
+
+- name: ({{ os_with_version }}) Check Certbot Installation Constraints
+  fail:
+   msg: "Veuillez renseigner le(s) nom(s) de domaine du certificat à générer ou renouveler"
+  when:
+   - certbot_generate_certs|bool
+   - domains is not defined or domains|length == 0
+
+- name: ({{ os_with_version }}) Installation Initialized facts [Recap]
+  debug:
+   msg:
+    - "OS System                    : {{ os_uname }}"
+    - "OS Architecture              : {{ os_arch }}"
+    - "OS Family                    : {{ os_family }}"
+    - "OS Distribution              : {{ os_distribution }}"
+    - "OS Code Name                 : {{ os_codename }}"
+    - "OS Major Version             : {{ os_major_release }}"
+    - "OS Full Version              : {{ os_release }}"
+    - "-----------------------------"
+    - "Install Certbot ?            : {{ certbot_install_tool }}"
+    - "Generate Certificate ?       : {{ certbot_generate_certs }}"
+    - "Certbot Packages             : {{ certbot_packages }}"
+    - "Certbot Renew Command        : {{ certbot_renew_post_command }}"

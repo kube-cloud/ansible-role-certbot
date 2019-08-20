@@ -1,0 +1,14 @@
+---
+
+- name: ({{ os_with_version }}) Generate and Renew Certificates
+  block:
+
+   - name: ({{ os_with_version }}) Renew certificate on Ubuntu and CentOS 7+
+     cron:
+      name: "Renew Certificates"
+      day: "*/{{ certbot_certs_validity }}"
+      job: "{{ certbot_renew_post_command }}"
+      state: present
+
+  when:
+   - certbot_generate_certs|bool

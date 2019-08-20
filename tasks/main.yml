@@ -1,0 +1,23 @@
+---
+# Install Certbot main tasks on Supported system
+- name: Install Certbot main tasks on Supported system
+  block:
+
+   # Include Initialize tasks (Linux)
+   - name: Include Initialize tasks
+     include_tasks: "initialize.yml"
+
+   # Include Install tasks (Linux)
+   - name: Include Install tasks for ({{ ansible_distribution }})
+     include_tasks: "install-{{ ansible_distribution }}.yml"
+     when:
+      - certbot_install_tool|bool
+
+   # Include Generate Cert tasks (Linux)
+   - name: Include Generate Cert tasks for ({{ ansible_distribution }})
+     include_tasks: "generate-cert.yml"
+     when:
+      - certbot_generate_certs|bool
+
+  when:
+   - ansible_os_family == "RedHat" or ansible_os_family == "Debian" or ansible_os_family == "Suse"

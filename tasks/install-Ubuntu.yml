@@ -1,0 +1,12 @@
+---
+
+- name: ({{ os_with_version }}) Install Certbot required repositories
+  apt_repository:
+   repo: "ppa:certbot/certbot"
+   state: present
+   update_cache: true
+
+- name: ({{ os_with_version }}) Install Certbot packages
+  apt:
+   name: "{{ certbot_packages }}"
+   state: present

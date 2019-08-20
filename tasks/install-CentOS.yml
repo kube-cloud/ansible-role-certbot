@@ -1,0 +1,72 @@
+---
+
+- name: ({{ os_with_version }}) Check EPEL Repo installed
+  stat:
+   path: "{{ epel_repofile_path }}"
+  register: epel_repofile_result
+
+- name: ({{ os_with_version }}) Install Certbot EPEL Repo
+  yum:
+   name: "{{ epel_repo_url }}"
+   state: present
+  register: result
+  until: result is succeeded
+  retries: 5
+  delay: 10
+  when: not epel_repofile_result.stat.exists
+
+- name: ({{ os_with_version }}) Import EPEL Repo Key
+  rpm_key:
+   key: "{{ epel_repo_gpg_key_url }}"
+  when: not epel_repofile_result.stat.exists
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: ({{ os_with_version }}) Role Installs for CentOS 7+
+  block:
+
+   - name: ({{ os_with_version }}) Uninstall urllib3 pip lib if exists
+     pip:
+      name: urllib3
+      state: absent
+     ignore_errors: true
+     changed_when: false
+     failed_when: false
+     check_mode: false
+     when:
+      - pip_installed|bool
+
+  when:
+   - ansible_distribution_major_version|int > 6
+
+- name: ({{ os_with_version }}) Role Installs for CentOS 6
+  block:
+
+   - name: ({{ os_with_version }}) Download and Install Certbot Auto script file
+     get_url:
+      url: "{{ certbot_auto_url }}"
+      dest: "/usr/local/bin/certbot-auto"
+      mode: u=rwx,g=rx,o=rx
+
+   - name: ({{ os_with_version }}) Create Symlink on Certbot Script
+     file:
+      src: "/usr/local/bin/certbot-auto"
+      dest: "/usr/bin/certbot-auto"
+      state: link
+
+  when:
+   - ansible_distribution_major_version|int == 6
+
+- name: ({{ os_with_version }}) Install Certbot packages
+  yum:
+   name: "{{ certbot_packages }}"
+   state: latest
+   enablerepo: "epel,updates"
+
+- name: ({{ os_with_version }}) Start Certbot Auto for the first time on CentOS 6
+  command: "certbot-auto"
+  ignore_errors: true
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  when:
+   - ansible_distribution_major_version|int == 6
