@@ -20,7 +20,6 @@ env:
         - MOLECULE_DISTRO: ubuntu18
 
 before_install:
-    - docker pull kubecloudsas/docker-ansible-test:centos6
     - docker pull kubecloudsas/docker-ansible-test:centos7
     - docker pull kubecloudsas/docker-ansible-test:ubuntu16
     - docker pull kubecloudsas/docker-ansible-test:ubuntu18
@@ -40,10 +39,7 @@ install:
 # Test scripts
 script:
 
-    - if [ "$MOLECULE_DISTRO" == "centos6" ]; then molecule test --scenario-name certbot_auto_install; fi
-    - if [ "$MOLECULE_DISTRO" == "centos7" ]; then molecule test --scenario-name certbot_install; fi
-    - if [ "$MOLECULE_DISTRO" == "ubuntu16" ]; then molecule test --scenario-name certbot_install; fi
-    - if [ "$MOLECULE_DISTRO" == "ubuntu18" ]; then molecule test --scenario-name certbot_install; fi
+    - molecule test --all
 
 # Norifications
 notifications:
