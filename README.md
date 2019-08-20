@@ -3,9 +3,9 @@
 ![Python](https://img.shields.io/pypi/pyversions/testinfra.svg?style=flat)
 ![Licence](https://img.shields.io/github/license/kube-cloud/ansible-role-certbot.svg?style=flat)
 [![Travis Build](https://img.shields.io/travis/kube-cloud/ansible-role-certbot.svg?style=flat)](https://travis-ci.com/kube-cloud/ansible-role-certbot)
-[![Galaxy Role Downloads](https://img.shields.io/ansible/role/d/42169.svg?style=flat)](https://galaxy.ansible.com/jetune/git)
+[![Galaxy Role Downloads](https://img.shields.io/ansible/role/d/42882.svg?style=flat)](https://galaxy.ansible.com/jetune/certbot)
 
-Ansible role used to install Docker Engine/Compose on Linux based Operating System.
+Ansible role used to install Certbot on Linux based Operating System.
 
 <a href="https://www.kube-cloud.com/"><img width="300" src="https://kube-cloud.com/images/branding/logo/kubecloud-logo-single_writing_horizontal_color_300x112px.png" /></a>
 <a href="https://www.redhat.com/fr/technologies/management/ansible"><img width="200" src="https://getvectorlogo.com/wp-content/uploads/2019/01/red-hat-ansible-vector-logo.png" /></a>
